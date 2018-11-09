@@ -2,7 +2,7 @@ const express = require('express');
 const volleyball = require('volleyball');
 const marked = require('marked');
 const layout = require('./views/layout');
-const { db } = require('./models');
+const { db, Page, User } = require('./models');
 
 const app = express();
 
@@ -20,6 +20,17 @@ app.get('/', (req, res) => {
 });
 
 const PORT = 3000;
+
+const init = async () => {
+  await User.sync()
+  await Page.sync()
+  //===WORKING ON THIS PART===//
+  app.listen(PORT, () => {
+    console.log(`Server is listening on port ${PORT}`)
+  })
+}
+
+init();
 
 app.listen(PORT, () => {
   console.log(`App listening in port ${PORT}`);
