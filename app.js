@@ -11,7 +11,7 @@ db.authenticate().then(() => {
   console.log('connected to the database');
 });
 
-db.sync({ force: true }); // WHEN?
+// db.sync({ force: true }); // Drops db date each time nodemon runs... Can add { force: true } as an argument to line 29 at any point one time to clear the db, then remove.
 
 app.use(volleyball);
 app.use(express.static(__dirname + '/public'));

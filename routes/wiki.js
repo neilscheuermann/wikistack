@@ -1,34 +1,36 @@
 const express = require('express');
 const router = express.Router();
-const { db, Page, User } = require('../models/index');
-const { addPage } = require('../views');
+const { db, Page, User } = require('../models');
+const { addPage, wikiPage, main } = require('../views');
 
-function generateSlug(title) {
-  return title.replace(/\s+/g, '_').replace(/\W/g, '');
-}
-
-router.get('/', (req, res, next) => {
-  res.send('nothing');
+router.get('/', async (req, res, next) => {
+  try {
+    const pages = await Page.findAll();
+    console.log(pages);
+    res.send(main(pages));
+  } catch (error) { next(error) }
 });
 
 router.post('/', async (req, res, next) => {
-  const { title, content } = req.body;
-  const page = new Page({
-    title,
-    content,
-    slug: generateSlug(title),
-  });
+  const page = new Page(req.body);
   try {
-    const returnedPage = await page.save();
-    console.log(returnedPage);
-    res.redirect('/');
-  } catch (error) {
-    next(error);
-  }
+    await page.save();
+    res.redirect(`/wiki/${page.slug}`);
+  } catch (error) { next(error) }
 });
 
 router.get('/add', (req, res, next) => {
   res.send(addPage());
 });
+
+router.get('/:slug', async (req, res, next) => {
+  try {
+    const page = await Page.findOne({
+      where: {slug: req.params.slug}
+    })
+    console.log(page)
+    res.send(wikiPage(page))
+  } catch (error) { next(error) }
+})
 
 module.exports = router;

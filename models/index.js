@@ -3,6 +3,10 @@ const db = new Sequelize('postgres://localhost:5432/wikistack', {
   logging: false,
 });
 
+function generateSlug(title) {
+  return title.replace(/\s+/g, '_').replace(/\W/g, '');
+}
+
 const Page = db.define('page', {
   title: {
     type: Sequelize.STRING,
@@ -21,6 +25,12 @@ const Page = db.define('page', {
   },
 });
 
+Page.beforeValidate((page) => {
+  if (!page.slug) {
+    page.slug = generateSlug(page.title);
+  }
+})
+
 const User = db.define('user', {
   name: {
     type: Sequelize.STRING,
@@ -34,5 +44,7 @@ const User = db.define('user', {
     },
   },
 });
+
+Page.belongsTo(User, { as: 'author' });
 
 module.exports = { db, Page, User };
